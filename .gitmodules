@@ -1,0 +1,3 @@
+[submodule "vendor/odin-jsonrpc"]
+	path = vendor/odin-jsonrpc
+	url = https://github.com/tagumasa/odin-jsonrpc
