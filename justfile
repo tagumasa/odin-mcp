@@ -1,8 +1,9 @@
 # odin-mcp build tasks. The protocol faces live under src/ (the
 # collection is `mcp:`); the wire layer is the vendored odin-jsonrpc
-# submodule (the `jsonrpc:` collection — never edited here, its gates
-# run in its own repository); the suites are a separate package in
-# tests/ importing both through the collections.
+# submodule (the `jsonrpc:` collection) and its nested odin-jsonutil
+# value layer (the `jsonutil:` collection) — their gates run in their
+# own repositories; the suites are a separate package in tests/
+# importing all three through the collections.
 
 # Odin links .exe on Windows; the tool binaries carry the suffix in
 # their names so one recipe line builds and invokes them on every OS.
@@ -12,10 +13,11 @@ exe := if os_family() == "windows" { ".exe" } else { "" }
 default:
     @just --list
 
-# Type-check the protocol package with vet and strict style. The wire
-# layer rides in through the jsonrpc collection and is checked with it.
+# Type-check the protocol package with vet and strict style. The
+# vendored wire and value layers ride in through the jsonrpc and
+# jsonutil collections and are checked with it.
 check:
-	odin check src/mcp -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -vet -strict-style -no-entry-point
+	odin check src/mcp -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -collection:jsonutil=vendor/odin-jsonrpc/vendor/odin-jsonutil/src -vet -strict-style -no-entry-point
 
 # Run the suites single-threaded under the log gate: the runner's own
 # exit status is honored first (a compile failure must not read as a
@@ -28,7 +30,7 @@ test:
 	set -e
 	mkdir -p tmp
 	set +e
-	odin test tests -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -define:ODIN_TEST_THREADS=1 > tmp/test.log 2>&1
+	odin test tests -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -collection:jsonutil=vendor/odin-jsonrpc/vendor/odin-jsonutil/src -define:ODIN_TEST_THREADS=1 > tmp/test.log 2>&1
 	status=$?
 	set -e
 	cat tmp/test.log
@@ -60,7 +62,7 @@ conformance:
 		exit 0
 	fi
 	mkdir -p bin
-	odin build tools/conformance -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -vet -strict-style -o:speed -out:bin/mcp-conformance{{exe}}
+	odin build tools/conformance -collection:mcp=src -collection:jsonrpc=vendor/odin-jsonrpc/src -collection:jsonutil=vendor/odin-jsonrpc/vendor/odin-jsonutil/src -vet -strict-style -o:speed -out:bin/mcp-conformance{{exe}}
 	echo "== conformance: the client face vs the reference SDK server =="
 	NODE_PATH="$sdk_nm" ./bin/mcp-conformance{{exe}} client node tools/conformance/sdk_server.cjs
 	echo "== conformance: the reference SDK client vs the server face =="

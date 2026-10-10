@@ -16,8 +16,8 @@ import "core:strings"
 import "core:thread"
 
 import "jsonrpc:jsonrpc"
-import "jsonrpc:jsonutil"
 import "jsonrpc:platform"
+import "jsonutil:jsonutil"
 
 CLIENT_INIT_TIMEOUT_MS :: i64(10_000)
 CLIENT_CALL_TIMEOUT_MS :: i64(30_000)

@@ -17,8 +17,8 @@ import "core:fmt"
 import "core:mem"
 import "core:strings"
 import "jsonrpc:jsonrpc"
-import "jsonrpc:jsonutil"
 import "jsonrpc:platform"
+import "jsonutil:jsonutil"
 
 // Tool_Entry is the wire-facing projection of a tool. The host builds
 // these from its own registry; the server face only serializes them.

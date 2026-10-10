@@ -13,7 +13,7 @@ import "core:sync"
 import "core:testing"
 import "core:thread"
 import "jsonrpc:jsonrpc"
-import "jsonrpc:jsonutil"
+import "jsonutil:jsonutil"
 import "mcp:mcp"
 import "jsonrpc:platform"
 

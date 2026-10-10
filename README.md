@@ -16,8 +16,10 @@ own specification lives in the odin-jsonrpc repository.
 ```
 src/mcp/           the protocol faces over one version table: the
                    server session and the client wire core
-vendor/odin-jsonrpc  the pinned wire-layer submodule (jsonrpc: and
-                   its internal support packages — never edited here)
+vendor/odin-jsonrpc  the pinned wire-layer submodule (jsonrpc:
+                   collection)
+  vendor/odin-jsonutil  the nested value-layer submodule (jsonutil:
+                   collection)
 tests/             the face suites plus the cross-face tests — this
                    library's own client against its own server over an
                    in-memory pipe pair
@@ -112,14 +114,14 @@ registries stay host-side on purpose.
 ```sh
 git clone https://github.com/tagumasa/odin-mcp
 cd odin-mcp
-git submodule update --init   # the vendored odin-jsonrpc wire layer
+git submodule update --init --recursive   # the wire layer and its nested value layer
 just check         # odin check -vet -strict-style over the protocol package
 just test          # serial suite; verdicts from the log, zero leak lines
 just conformance   # both faces vs the TypeScript SDK (see below)
 ```
 
 `just check` and `just test` are self-contained: the Odin compiler,
-`just`, and the submodule are the whole setup. `just conformance`
+`just`, and the submodules are the whole setup. `just conformance`
 additionally needs a `@modelcontextprotocol/sdk` install
 (`MCP_SDK_NODE_MODULES` points at one; without it the recipe reports
 SKIP loudly).
@@ -132,8 +134,8 @@ SKIP loudly).
 - `just` (any recent version); on Windows the `sh`-scripted recipes
   (`test`, `conformance`) need Git Bash's `sh` on PATH — the CI
   runner image carries it
-- The `vendor/odin-jsonrpc` submodule initialized
-  (`git submodule update --init`)
+- The `vendor/odin-jsonrpc` submodule (and its nested `odin-jsonutil`)
+  initialized (`git submodule update --init --recursive`)
 - Node with the reference SDK, only for `just conformance`
 
 ## Conformance
