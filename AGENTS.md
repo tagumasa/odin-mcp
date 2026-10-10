@@ -14,11 +14,12 @@ faces over one protocol-version table: the server session and the
 client wire core — built on the vendored odin-jsonrpc wire layer
 (`vendor/odin-jsonrpc`, the `jsonrpc:` collection: both framings,
 the envelope, the Conn, the outbound writer, the request queue, and
-its support packages) and its nested odin-jsonutil value layer
-(`vendor/odin-jsonrpc/vendor/odin-jsonutil`, the `jsonutil:`
-collection). The submodules are never edited here — a wire- or
-value-layer bug or improvement lands in the odin-jsonrpc or
-odin-jsonutil repository and rides the next pin bump. The client
+its support packages) and the odin-jsonutil value layer
+(`vendor/odin-jsonutil`, the `jsonutil:` collection — a direct
+top-level pin, not the copy nested inside odin-jsonrpc). The
+submodules are never edited here — a wire- or value-layer bug or
+improvement lands in the odin-jsonrpc or odin-jsonutil repository
+and rides the next pin bump. The client
 face reports failures through its own closed `Client_Err`, never
 through the wire layer's internal vocabulary.
 
@@ -30,17 +31,23 @@ permission.
 ### Package layout and dependency direction
 
 `src/` is a single collection (imports use the `mcp:` prefix); the
-wire layer rides in as the `jsonrpc:` collection, its value layer as
-the nested `jsonutil:` collection. Dependencies flow one way only:
+wire layer rides in as the `jsonrpc:` collection, the value layer as
+the `jsonutil:` collection — both direct top-level pins.
+Dependencies flow one way only:
 
 ```
 vendor/odin-jsonrpc (pinned submodule, jsonrpc: collection)
-  vendor/odin-jsonutil (nested pinned submodule, jsonutil:
-                       collection)
+vendor/odin-jsonutil (pinned submodule, jsonutil: collection)
   ↑ mcp (both protocol faces over one version table)
 ```
 
 - Lower layers must not import upper layers.
+- The `jsonutil:` collection points at this repository's own
+  `vendor/odin-jsonutil` pin, which is what every `jsonutil:` import
+  — the vendored odin-jsonrpc's own included — compiles against; it
+  stays at or above the odin-jsonutil pointer nested inside the
+  vendored odin-jsonrpc (check that pointer whenever the wire
+  layer's pin moves).
 - The protocol-version table is a single constant in `src/mcp`; both
   faces reference it.
 - No process-global variables: state rides the owning struct
@@ -86,7 +93,7 @@ name the identifier that owns the exact value.
 ## Build, test, and measure
 
 ```sh
-git submodule update --init --recursive   # the wire layer and its nested value layer
+git submodule update --init   # the wire and value layers, both top-level pins
 just check        # odin check -vet -strict-style -no-entry-point, the protocol package
 just test         # odin test tests (ODIN_TEST_THREADS=1), log-gated
 just conformance  # both faces vs the TypeScript SDK over real stdio pipes

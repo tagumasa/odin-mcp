@@ -14,9 +14,9 @@ vendor/odin-jsonrpc  the pinned wire-layer submodule (jsonrpc:
                      writer, the bounded request queue, and its
                      support packages (the cancel-token tree, the
                      monotonic clock)
-  vendor/odin-jsonutil  the nested value-layer submodule (jsonutil:
-                       collection): JSON value construction,
-                       cloning, and freeing
+vendor/odin-jsonutil  the pinned value-layer submodule (jsonutil:
+                     collection): JSON value construction, cloning,
+                     and freeing
 src/mcp              the protocol faces over one version table:
                      the server session and the client wire core
 ```
@@ -25,7 +25,13 @@ src/mcp              the protocol faces over one version table:
 its value layer through `jsonutil:`, and nothing else beyond
 `core:*`. The submodules are never edited here — a bug or an
 improvement in either layer lands in the odin-jsonrpc or
-odin-jsonutil repository and rides the next pin bump. The cancel
+odin-jsonutil repository and rides the next pin bump. Both layers
+are direct top-level pins: the justfile's `-collection:jsonutil`
+flag decides which copy every `jsonutil:` import resolves to, the
+vendored odin-jsonrpc's own imports included, and it stays at or
+above the odin-jsonutil pointer nested inside the vendored
+odin-jsonrpc (check that pointer whenever the wire layer's pin
+moves). The cancel
 tree is host-facing API on the wire layer's side
 (`jsonrpc.conn_call`'s token parameter carries its type); hosts
 that need a blocking wait use its `token_wait`.
