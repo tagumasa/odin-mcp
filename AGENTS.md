@@ -14,11 +14,13 @@ faces over one protocol-version table: the server session and the
 client wire core — built on the vendored odin-jsonrpc wire layer
 (`vendor/odin-jsonrpc`, the `jsonrpc:` collection: both framings,
 the envelope, the Conn, the outbound writer, the request queue, and
-its internal support packages). The submodule is never edited here —
-a wire-layer bug or improvement lands in the odin-jsonrpc repository
-and rides the next pin bump. The client face reports failures
-through its own closed `Client_Err`, never through the wire layer's
-internal vocabulary.
+its support packages) and its nested odin-jsonutil value layer
+(`vendor/odin-jsonrpc/vendor/odin-jsonutil`, the `jsonutil:`
+collection). The submodules are never edited here — a wire- or
+value-layer bug or improvement lands in the odin-jsonrpc or
+odin-jsonutil repository and rides the next pin bump. The client
+face reports failures through its own closed `Client_Err`, never
+through the wire layer's internal vocabulary.
 
 Hosts own logging (no module-global logger: the server's diagnostics
 ride the `Server.log_fn` hook, the client face returns prose with its
@@ -28,13 +30,13 @@ permission.
 ### Package layout and dependency direction
 
 `src/` is a single collection (imports use the `mcp:` prefix); the
-wire layer rides in as the `jsonrpc:` collection. Dependencies flow
-one way only:
+wire layer rides in as the `jsonrpc:` collection, its value layer as
+the nested `jsonutil:` collection. Dependencies flow one way only:
 
 ```
-vendor/odin-jsonrpc (pinned submodule, jsonrpc: collection —
-                     never edited here, its gates run in its own
-                     repository)
+vendor/odin-jsonrpc (pinned submodule, jsonrpc: collection)
+  vendor/odin-jsonutil (nested pinned submodule, jsonutil:
+                       collection)
   ↑ mcp (both protocol faces over one version table)
 ```
 
@@ -84,7 +86,7 @@ name the identifier that owns the exact value.
 ## Build, test, and measure
 
 ```sh
-git submodule update --init   # the vendored odin-jsonrpc wire layer
+git submodule update --init --recursive   # the wire layer and its nested value layer
 just check        # odin check -vet -strict-style -no-entry-point, the protocol package
 just test         # odin test tests (ODIN_TEST_THREADS=1), log-gated
 just conformance  # both faces vs the TypeScript SDK over real stdio pipes
@@ -164,7 +166,7 @@ just conformance  # both faces vs the TypeScript SDK over real stdio pipes
 
 - The justfile's `exe` variable carries the Windows suffix — tool
   binaries build and invoke as `bin/<name>{{exe}}` on every OS.
-- The `sh`-scripted recipes (`test`, `conformance`, `bench-callgrind`)
+- The `sh`-scripted recipes (`test`, `conformance`)
   need Git Bash's `sh` on PATH on Windows; the CI runner image carries
   it.
 

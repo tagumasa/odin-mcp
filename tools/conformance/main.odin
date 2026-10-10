@@ -32,7 +32,7 @@ import "core:thread"
 import "core:time"
 
 import "jsonrpc:jsonrpc"
-import "jsonrpc:jsonutil"
+import "jsonutil:jsonutil"
 import "mcp:mcp"
 import "jsonrpc:platform"
 
