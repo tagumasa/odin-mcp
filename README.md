@@ -18,7 +18,7 @@ src/mcp/           the protocol faces over one version table: the
                    server session and the client wire core
 vendor/odin-jsonrpc  the pinned wire-layer submodule (jsonrpc:
                    collection)
-  vendor/odin-jsonutil  the nested value-layer submodule (jsonutil:
+vendor/odin-jsonutil  the pinned value-layer submodule (jsonutil:
                    collection)
 tests/             the face suites plus the cross-face tests — this
                    library's own client against its own server over an
@@ -114,7 +114,7 @@ registries stay host-side on purpose.
 ```sh
 git clone https://github.com/tagumasa/odin-mcp
 cd odin-mcp
-git submodule update --init --recursive   # the wire layer and its nested value layer
+git submodule update --init   # the wire and value layers, both top-level pins
 just check         # odin check -vet -strict-style over the protocol package
 just test          # serial suite; verdicts from the log, zero leak lines
 just conformance   # both faces vs the TypeScript SDK (see below)
@@ -134,8 +134,8 @@ SKIP loudly).
 - `just` (any recent version); on Windows the `sh`-scripted recipes
   (`test`, `conformance`) need Git Bash's `sh` on PATH — the CI
   runner image carries it
-- The `vendor/odin-jsonrpc` submodule (and its nested `odin-jsonutil`)
-  initialized (`git submodule update --init --recursive`)
+- The `vendor/odin-jsonrpc` and `vendor/odin-jsonutil` submodules
+  initialized (`git submodule update --init`)
 - Node with the reference SDK, only for `just conformance`
 
 ## Conformance
