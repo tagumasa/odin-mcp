@@ -26,10 +26,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-26.04-arm, macos-latest, windows-latest]
     steps:
-      # The wire layer rides in as a pinned submodule.
+      # The wire layer rides in as a pinned submodule; recursive
+      # because the value layer (odin-jsonutil) is nested inside it.
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
 
       # The nightly distribution replaces assets under the same date key
       # (consecutive runs can silently test different compilers). The
@@ -93,10 +94,11 @@ jobs:
     name: Conformance (TypeScript SDK)
     runs-on: ubuntu-latest
     steps:
-      # The wire layer rides in as a pinned submodule.
+      # The wire layer rides in as a pinned submodule; recursive
+      # because the value layer (odin-jsonutil) is nested inside it.
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Set up Odin (dev-2026-10)
         uses: laytan/setup-odin@v2
